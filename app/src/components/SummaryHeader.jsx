@@ -7,7 +7,7 @@ export function SummaryHeader({ meta, anchors, engineEvents }) {
   return (
     <header className="hero">
       <div className="hero-copy">
-        <p className="eyebrow">{meta.eyebrow || "严格根据 CSV 已记录数据"}</p>
+        <p className="eyebrow">{meta.eyebrow || "MU5735 末段数据回放"}</p>
         <h1>{meta.title || "MU5735 回放"}</h1>
         <p className="subtitle">{meta.subtitle}</p>
       </div>

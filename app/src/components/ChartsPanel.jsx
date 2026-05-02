@@ -79,7 +79,7 @@ function NoDataOverlay({ text }) {
   return (
     <div className="chart-empty">
       <strong>{text}</strong>
-      <span>保持空白比伪造连续数据更可靠</span>
+      <span>该时段缺少可直接支持的记录</span>
     </div>
   );
 }
@@ -277,9 +277,9 @@ export function ChartsPanel({ meta, replay, anchors }) {
     <section className={`charts-section${replay.inPureAds ? " energy-focus" : ""}`} id="chartsSection">
       <div className="section-head">
         <h2>核心图表</h2>
-        <p>使用现成图表组件补上比例尺、坐标轴、事件线、游标线与交互读值</p>
+        <p>集中展示末段能量、姿态和操纵变化</p>
       </div>
-      <div className="chart-legend-note">实线为原始观测，虚线为短缺口插值；灰带为残影/占位区，青带为纯 ADS 段。</div>
+      <div className="chart-legend-note">实线为原始记录，虚线为短时插值；灰带表示异常记录区，青带表示纯 ADS 段。</div>
       <div className="chart-grid-main">
         {energyChart ? (
           <article

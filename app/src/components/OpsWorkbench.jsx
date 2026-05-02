@@ -26,8 +26,8 @@ export function OpsWorkbench({ meta, replay, cutoff1, cutoff2, cutoffDetail }) {
   return (
     <aside className={`ops-panel${inPureAds ? " panel-hidden" : ""}`} id="opsPanel">
       <div className="ops-head">
-        <h2>实体操作台</h2>
-        <p>围绕巡航基准位校准，优先看操纵件与关断开关</p>
+        <h2>操纵与系统状态</h2>
+        <p>展示控制输入、舵面反馈与发动机状态</p>
       </div>
 
       <section className={`ops-section${inPureAds ? " panel-hidden" : ""}`} id="cutoffSection">

@@ -77,7 +77,7 @@ export default function App() {
   }
 
   if (!data || !replay) {
-    return <LoadingState message="加载 MU5735 回放数据" detail="正在初始化 React + Vite 回放工作台。" />;
+    return <LoadingState message="加载 MU5735 回放数据" detail="正在初始化回放页面。" />;
   }
 
   const { meta, anchors } = data;

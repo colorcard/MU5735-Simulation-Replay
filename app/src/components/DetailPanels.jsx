@@ -41,7 +41,7 @@ export function DetailPanels({ meta, replay, anchors, snapshotItems, currentQual
 
   return (
     <details className="data-collapse" open={!replay.inPureAds} id="dataCollapse">
-      <summary>展开双发细节曲线、当前状态和数据质量</summary>
+      <summary>展开双发细节曲线、状态摘要与数据质量</summary>
       <div className="data-collapse-grid">
         {detailCharts.map((config) => (
           <DetailChart key={config.id} config={config} replay={replay} meta={meta} anchors={anchors} hidden={replay.inPureAds} />
@@ -67,16 +67,16 @@ export function DetailPanels({ meta, replay, anchors, snapshotItems, currentQual
             </div>
             <div>
               <span className="dot derived" />
-              仅视觉派生
+              派生量
             </div>
             <div>
               <span className="dot placeholder" />
-              修复/占位伪影
+              异常/占位记录
             </div>
           </div>
         </section>
         <section className="state-panel">
-          <h3>方法说明</h3>
+          <h3>说明</h3>
           <ul className="method-notes">
             {meta.notes.map((note) => (
               <li key={note}>{note}</li>

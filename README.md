@@ -1,177 +1,43 @@
 # MU5735 ADS-B + FDR 最后 2 分钟回放
 
-这是一个围绕 MU5735 事故最后 2 分钟构建的网页回放项目。网页主时间轴采用 ADS-B Reveal 的末段记录，前约 26.8 秒与本地 FDR 导出数据重叠；其后进入纯 ADS-B 段，只保留公开外部轨迹与严格派生量。
+这是一个围绕 MU5735 事故末段数据构建的网页回放项目。它把公开 ADS-B Reveal 记录与本地 FDR 导出做时间对齐和分层融合，最终生成一个可直接浏览的末两分钟动态回放，用来观察高度、地速、操纵输入、发动机状态以及 FDR 结束后的纯 ADS-B 轨迹延续。
 
-## 项目结构
+回放主时间轴以 ADS-B Reveal 最后一条记录为终点，向前回溯 120 秒。窗口前段约 26.8 秒与 FDR 存在有限重叠，因此这一段能够展示姿态、操纵和发动机等机载记录；当时间轴进入纯 ADS-B 区间后，页面只保留高度、地速、航迹和严格派生量，不对缺失的 FDR 量做伪造补齐。
 
-```text
-webapp/
-├─ app/                 # React + Vite 网页
-├─ tools/               # 数据处理脚本
-├─ data/
-│  ├─ raw/              # 原始输入
-│  ├─ processed/        # 融合/对齐后的中间结果
-│  └─ web_payload/      # 网页直接消费的 JSON/JS 载荷
-├─ package.json
-└─ README.md
-```
+## 结构
 
-## 数据源
+仓库分成三个主要部分：`app/` 是 React + Vite 前端，`tools/` 是数据处理脚本，`data/` 保存原始输入、中间结果和供网页直接加载的回放载荷。这样拆分后，网页、处理工具和数据来源彼此独立，后续无论是继续补充数据链，还是直接部署静态页面，都比较清晰。
 
-### 1. FDR 本地导出
+## 数据来源与处理
 
-位于 `data/raw/fdr/`：
+原始数据来自两条链路。`data/raw/fdr/` 下的 `ExactSample.csv` 与 `TableResolution.csv` 保存本地 FDR 导出，其中包含姿态、控制输入、发动机转速、燃油流量等字段，也保留了表格型导出里用于识别异常记录和占位值的信息。`data/raw/adsb_reveal/` 下则放置了来自 `ErnestThePoet/MU5735-ADSB-Reveal` 的 `Merged Data.xlsx`、`Flightradar24 Granular Data.csv` 及相关说明文件，作为末段外部轨迹和速度信息的公开来源。
 
-- `ExactSample.csv`
-  主要 FDR 数值与状态导出，包含姿态、控制输入、发动机、燃油流量等。
-- `TableResolution.csv`
-  用于补充和识别部分表格型导出记录，同时用于识别占位/残影段。
+处理链分为三步。`tools/build_adsb_reveal_csv.py` 先解析 Reveal 工作簿中的 `track` 和 `crash` 工作表，统一时间基准，整理经纬度、高度、地速、垂速、航向等字段，并结合 FR24 粒度数据做最近邻补充，输出 `data/processed/MU5735_ADSB_reveal_fused.csv`。`tools/build_fdr_adsb_aligned_csv.py` 再利用高度、地速和航向做加权时间偏移拟合，把 ADS-B 时间映射到 FDR 绝对时间，生成对齐主表、重叠段表、最后 5 分钟对齐表以及对应的元数据。最后，`tools/build_mu5735_web_last2min.py` 从对齐结果中抽取最后两分钟，按 0.05 秒采样网格构建网页载荷，并同步到 `app/public/data/` 供前端直接读取。
 
-### 2. ADS-B Reveal / FR24 原始输入
+这条处理链的原则很简单：统一时间轴、区分来源层级、把缺失显式保留下来。重叠段内允许使用观测值和短时插值，但异常段会单独标注；FDR 终止后，姿态、操纵和发动机量不会被延展到纯 ADS-B 区间。
 
-位于 `data/raw/adsb_reveal/`：
+## 网页展示
 
-- `Merged Data.xlsx`
-  来自公开仓库 `ErnestThePoet/MU5735-ADSB-Reveal` 的整合工作簿。
-- `Flightradar24 Granular Data.csv`
-  同仓库附带的 FR24 细粒度记录，用于补充时间对齐与外部轨迹字段。
-- `README.md`
-  原仓库说明。
-- `LICENSE`
-  原仓库许可证。
+网页默认加载 `data/web_payload/mu5735_last2min_fused.json`。页面顶部提供回放时间范围、关键系统事件和播放控制，主时间轴内直接嵌入 Cutoff 切换、N2 衰减、燃油接近归零、FDR 终止、进入纯 ADS-B 区间以及高度和地速门槛等节点，同时显式标出异常记录区和纯 ADS 区间，方便把“有机载记录支撑”和“只有外部轨迹支撑”的部分区分开看。
 
-## 处理链
+页面主体聚焦在几类信息上：一侧是操纵与系统状态，包括操纵杆、操纵盘、舵面反馈、Cutoff 开关和双发即时状态；另一侧是关键图表，集中展示高度/地速、俯仰/横滚/滚转率、操纵输入，以及与发动机关断有关的 Cutoff、Fuel Flow、N2 变化。细节区还会补充双发转速与燃油流量的分项曲线、当前时刻摘要和数据质量标记，尽量把“发生了什么”和“哪些量已经缺失”放在同一页面上交代清楚。
 
-### 步骤 1：标准化 ADS-B Reveal 数据
-
-脚本：
-
-- `tools/build_adsb_reveal_csv.py`
-
-输入：
-
-- `data/raw/adsb_reveal/Merged Data.xlsx`
-- `data/raw/adsb_reveal/Flightradar24 Granular Data.csv`
-
-输出：
-
-- `data/processed/MU5735_ADSB_reveal_fused.csv`
-
-处理方式：
-
-- 解析 Reveal 工作簿中的 `track` / `crash` 两张表。
-- 将时间统一到 CST 本地时间与 UTC。
-- 合并经纬度、高度、地速、垂速、航向等字段。
-- 用 FR24 粒度数据做最近邻补充与匹配标记。
-
-### 步骤 2：ADS-B 与 FDR 二次对齐
-
-脚本：
-
-- `tools/build_fdr_adsb_aligned_csv.py`
-
-输入：
-
-- `data/processed/MU5735_ADSB_reveal_fused.csv`
-- `data/raw/fdr/ExactSample.csv`
-- `data/raw/fdr/TableResolution.csv`
-
-输出：
-
-- `data/processed/MU5735_FDR_ADSB_aligned.csv`
-- `data/processed/MU5735_FDR_ADSB_overlap.csv`
-- `data/processed/MU5735_FDR_ADSB_last5min_aligned.csv`
-- `data/processed/MU5735_FDR_ADSB_alignment_meta.json`
-
-处理方式：
-
-- 以高度、地速、航向三项为主，做加权时间偏移拟合。
-- 将 ADS-B 时间轴映射到 FDR 绝对时间。
-- 对 FDR 数值字段做观测/插值/缺失标记。
-- 对 `TableResolution.csv` 中明显占位值做过滤，不把伪影当作真实观测。
-
-### 步骤 3：生成网页 2 分钟回放载荷
-
-脚本：
-
-- `tools/build_mu5735_web_last2min.py`
-
-输入：
-
-- `data/processed/MU5735_FDR_ADSB_aligned.csv`
-- `data/raw/fdr/ExactSample.csv`
-- `data/raw/fdr/TableResolution.csv`
-
-输出：
-
-- `data/web_payload/mu5735_last2min_fused.json`
-- `data/web_payload/mu5735_last2min_fused.js`
-
-处理方式：
-
-- 以 ADS-B 末条记录向前回溯 120 秒，构建 0.05 秒采样网格。
-- 在 FDR 重叠段内插值姿态、控制和发动机参数。
-- 对残影/占位区显式标记，不做伪造连续补段。
-- FDR 终止后仅保留 ADS-B 可直接观测字段与严格派生量。
-- 生成时间轴事件、质量标注、范围统计和网页所需元数据。
-
-## 网页内容
-
-`app/` 是当前实际部署的 React + Vite 前端，默认读取：
-
-- `data/web_payload/mu5735_last2min_fused.json`
-
-网页当前展示重点：
-
-- ADS-B 时间轴下的最后 2 分钟回放
-- FDR / 纯 ADS 段边界标注
-- 高度 / 地速主图
-- 俯仰 / 横滚 / 滚转率
-- 操纵输入
-- Cutoff / Fuel Flow / N2 事故链证据图
-- 当前状态、数据质量与方法说明
+整个网页采用的展示约束是：只呈现真实记录，或者能够被当前数据严格支撑的派生量。纯 ADS-B 区间不会虚构 FDR 姿态和发动机参数，异常或占位记录也不会被包装成平滑连续的观测。
 
 ## 常用命令
 
-安装依赖：
-
 ```bash
 npm install
-```
-
-仅同步网页载荷到前端静态目录：
-
-```bash
 npm run sync:data
-```
-
-重建整条数据链：
-
-```bash
 npm run rebuild:data
-```
-
-启动开发环境：
-
-```bash
 npm run dev
-```
-
-构建部署产物：
-
-```bash
 npm run build
-```
-
-本地预览部署产物：
-
-```bash
 npm run preview
 ```
 
-## Git 仓库建议
+`npm run sync:data` 用于把网页载荷同步到前端静态目录；`npm run rebuild:data` 会从原始输入开始重跑整条数据链；`npm run build` 则把可部署的前端产物输出到 `dist/`。
 
-如果你要把这个目录单独作为仓库，直接在 `webapp/` 下执行：
+如果你准备把当前目录直接作为独立仓库发布，初始化方式也很直接：
 
 ```bash
 git init

@@ -69,7 +69,7 @@ export function TimelineTrack({ meta, anchors, replay }) {
 
       <div className="timeline-inline-head">
         <strong>事故时间轴</strong>
-        <span>关键节点已直接嵌入主时间轴，下方继续保留完整说明与跳转入口</span>
+        <span>下方列出关键节点说明，可点击跳转到对应时刻</span>
       </div>
       <div className="anchor-row anchor-row-inline">
         {orderedAnchors.map((anchor) => (

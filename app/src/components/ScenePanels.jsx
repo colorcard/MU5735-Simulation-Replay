@@ -280,8 +280,8 @@ export function ScenePanels({ replay }) {
   return (
     <section className={`scene-section${replay.inPureAds ? " panel-hidden" : ""}`} id="sceneSection">
       <div className="section-head">
-        <h2>姿态与场景</h2>
-        <p>主画布展示姿态变化与即时外部参数</p>
+        <h2>姿态示意</h2>
+        <p>示意展示姿态变化及相关外部参数</p>
       </div>
       <div className="scene-stage">
         <HorizonCanvas replay={replay} resizeTick={resizeTick} />
@@ -322,7 +322,7 @@ export function EngineEvidencePanel({ meta, replay }) {
   return (
     <section className={`evidence-strip${replay.inPureAds ? " panel-hidden" : ""}`} id="engineEvidencePanel">
       <div className="evidence-head">
-        <h3>事故链证据图</h3>
+        <h3>发动机相关记录</h3>
         <span>Cutoff SW / Fuel Flow / N2</span>
       </div>
       <EngineEvidenceCanvas replay={replay} meta={meta} resizeTick={resizeTick} />

@@ -2,7 +2,7 @@ export const chartConfigs = [
   {
     id: "chart-energy",
     title: "高度 / 地速",
-    subtitle: "能量坍塌主图",
+    subtitle: "末段能量变化",
     className: "chart-panel chart-panel-large",
     svgClassName: "chart-svg chart-svg-large",
     timelineMode: "full",
@@ -18,7 +18,7 @@ export const chartConfigs = [
   {
     id: "chart-attitude",
     title: "俯仰 / 横滚 / 滚转率",
-    subtitle: "姿态失稳主图",
+    subtitle: "姿态变化",
     className: "chart-panel chart-panel-large",
     svgClassName: "chart-svg chart-svg-large",
     timelineMode: "fdr",
@@ -52,7 +52,7 @@ export const chartConfigs = [
   {
     id: "chart-engines",
     title: "双发 N2",
-    subtitle: "原始 + 插值",
+    subtitle: "记录值与短时插值",
     className: "chart-panel",
     svgClassName: "chart-svg",
     timelineMode: "fdr",
@@ -67,7 +67,7 @@ export const chartConfigs = [
   {
     id: "chart-fuel",
     title: "双发燃油流量",
-    subtitle: "关断后的直接后续响应",
+    subtitle: "末段燃油流量变化",
     className: "chart-panel",
     svgClassName: "chart-svg",
     timelineMode: "fdr",
@@ -111,7 +111,7 @@ export function qualityText(quality) {
     case "missing":
       return "缺失";
     case "placeholder":
-      return "占位/伪影";
+      return "异常/占位";
     case "derived":
       return "派生";
     default:
