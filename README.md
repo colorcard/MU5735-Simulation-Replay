@@ -38,3 +38,7 @@ webapp/
 FDR 导出数据来源： [wrongly-cuddly-obsession/NTSB_FOIA_MU5735](https://github.com/wrongly-cuddly-obsession/NTSB_FOIA_MU5735)
 
 ADS-B 数据来源：[ErnestThePoet/MU5735-ADSB-Reveal](https://github.com/ErnestThePoet/MU5735-ADSB-Reveal)
+
+## 开源协议
+
+本项目采用 [MIT 开源协议](LICENSE) 发布。
