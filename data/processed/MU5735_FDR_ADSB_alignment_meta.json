@@ -1,0 +1,13 @@
+{
+  "offset_seconds": 1647554687.6,
+  "offset_fit_rmse": 0.058456,
+  "offset_fit_matched_rows": 18,
+  "fdr_time_range": {
+    "min_abs": 288200.6152,
+    "max_abs": 288977.5391,
+    "min_local_cst": "2022-03-21T14:08:08.215200+08:00",
+    "max_local_cst": "2022-03-21T14:21:05.139100+08:00"
+  },
+  "adsb_rows": 1939,
+  "overlap_rows": 716
+}

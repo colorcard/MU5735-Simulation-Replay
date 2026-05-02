@@ -1,0 +1,28 @@
+{
+  "name": "mu5735-web-replay",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "sync:data": "node ./tools/sync-web-data.mjs",
+    "build:data:adsb": "python3 ./tools/build_adsb_reveal_csv.py",
+    "build:data:align": "python3 ./tools/build_fdr_adsb_aligned_csv.py",
+    "build:data:web": "python3 ./tools/build_mu5735_web_last2min.py && npm run sync:data",
+    "rebuild:data": "npm run build:data:adsb && npm run build:data:align && npm run build:data:web",
+    "predev": "npm run sync:data",
+    "dev": "vite --config ./app/vite.config.js",
+    "prebuild": "npm run sync:data",
+    "build": "vite build --config ./app/vite.config.js",
+    "preview": "vite preview --config ./app/vite.config.js"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "recharts": "^2.13.3"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.4",
+    "playwright-core": "^1.59.1",
+    "vite": "^5.4.10"
+  }
+}
